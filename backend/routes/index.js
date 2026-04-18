@@ -19,6 +19,8 @@ router.get('/dashboard/stats', authenticate, authorize('Admin', 'Faculty'), dash
 
 // ── STUDENTS ──────────────────────────────────────────────────────────────────
 router.get('/students',           authenticate, authorize('Admin', 'Faculty'), students.getAll);
+router.get('/students/me',        authenticate, authorize('Student'), students.getMe);
+router.get('/students/me/courses', authenticate, authorize('Student'), students.getMyCourses);
 router.get('/students/:id',       authenticate, students.getById);
 router.post('/students',          authenticate, authorize('Admin'), students.create);
 router.put('/students/:id',       authenticate, authorize('Admin'), students.update);
@@ -49,6 +51,6 @@ router.get('/roles',              authenticate, users.getRoles);
 // ── REGISTRATIONS ─────────────────────────────────────────────────────────────
 router.get('/registrations',      authenticate, authorize('Admin','Faculty'), registrations.getAll);
 router.post('/registrations',     authenticate, authorize('Admin','Student'), registrations.register);
-router.delete('/registrations/:id', authenticate, authorize('Admin'), registrations.unregister);
+router.delete('/registrations/:id', authenticate, authorize('Admin','Student'), registrations.unregister);
 
 module.exports = router;

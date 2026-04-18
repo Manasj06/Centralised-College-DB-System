@@ -1,5 +1,15 @@
 const db = require('../config/db');
 
+async function findStudentByEmail(email) {
+  const [rows] = await db.query(
+    `SELECT s.*, c.college_name FROM Student s
+     JOIN College c ON c.college_id = s.college_id
+     WHERE s.email = ?`,
+    [email]
+  );
+  return rows[0] || null;
+}
+
 async function getAll(req, res) {
   try {
     const [rows] = await db.query(
@@ -23,6 +33,16 @@ async function getById(req, res) {
     );
     if (!rows.length) return res.status(404).json({ success: false, message: 'Student not found' });
     res.json({ success: true, data: rows[0] });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+}
+
+async function getMe(req, res) {
+  try {
+    const student = await findStudentByEmail(req.user.email);
+    if (!student) return res.status(404).json({ success: false, message: 'Student not found' });
+    res.json({ success: true, data: student });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -83,7 +103,7 @@ async function remove(req, res) {
 // Get student's registrations
 async function getStudentCourses(req, res) {
   try {
-    const studentId = req.params.id || req.user.user_id;
+    const studentId = req.params.id;
     const [rows] = await db.query(
       `SELECT r.reg_id, c.course_id, c.course_name, c.course_code, c.credits,
               col.college_name, r.registered_at
@@ -100,4 +120,26 @@ async function getStudentCourses(req, res) {
   }
 }
 
-module.exports = { getAll, getById, create, update, remove, getStudentCourses };
+async function getMyCourses(req, res) {
+  try {
+    const student = await findStudentByEmail(req.user.email);
+    if (!student) return res.status(404).json({ success: false, message: 'Student not found' });
+
+    const [rows] = await db.query(
+      `SELECT r.reg_id, c.course_id, c.course_name, c.course_code, c.credits,
+              col.college_name, r.registered_at
+       FROM Registration r
+       JOIN Course c   ON c.course_id  = r.course_id
+       JOIN College col ON col.college_id = c.college_id
+       WHERE r.student_id = ?
+       ORDER BY r.registered_at DESC`,
+      [student.student_id]
+    );
+
+    res.json({ success: true, data: rows });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+}
+
+module.exports = { getAll, getById, getMe, create, update, remove, getStudentCourses, getMyCourses };

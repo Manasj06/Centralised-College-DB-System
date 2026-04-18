@@ -1,5 +1,13 @@
 const db = require('../config/db');
 
+async function findStudentIdByEmail(connOrDb, email) {
+  const [rows] = await connOrDb.query(
+    'SELECT student_id FROM Student WHERE email = ?',
+    [email]
+  );
+  return rows[0]?.student_id || null;
+}
+
 async function getAll(req, res) {
   try {
     const [rows] = await db.query(
@@ -21,11 +29,22 @@ async function getAll(req, res) {
 async function register(req, res) {
   const conn = await db.getConnection();
   try {
-    const { student_id, course_id } = req.body;
-    if (!student_id || !course_id)
-      return res.status(400).json({ success: false, message: 'student_id and course_id required' });
+    let { student_id, course_id } = req.body;
+    if (!course_id)
+      return res.status(400).json({ success: false, message: 'course_id required' });
 
     await conn.beginTransaction();
+
+    if (req.user.role === 'Student') {
+      student_id = await findStudentIdByEmail(conn, req.user.email);
+      if (!student_id) {
+        await conn.rollback();
+        return res.status(404).json({ success: false, message: 'Student profile not found' });
+      }
+    } else if (!student_id) {
+      await conn.rollback();
+      return res.status(400).json({ success: false, message: 'student_id required' });
+    }
 
     // Check duplicate
     const [exists] = await conn.query(
@@ -62,7 +81,22 @@ async function register(req, res) {
 
 async function unregister(req, res) {
   try {
-    const [result] = await db.query('DELETE FROM Registration WHERE reg_id = ?', [req.params.id]);
+    let result;
+
+    if (req.user.role === 'Student') {
+      const studentId = await findStudentIdByEmail(db, req.user.email);
+      if (!studentId) {
+        return res.status(404).json({ success: false, message: 'Student profile not found' });
+      }
+
+      [result] = await db.query(
+        'DELETE FROM Registration WHERE reg_id = ? AND student_id = ?',
+        [req.params.id, studentId]
+      );
+    } else {
+      [result] = await db.query('DELETE FROM Registration WHERE reg_id = ?', [req.params.id]);
+    }
+
     if (!result.affectedRows) return res.status(404).json({ success: false, message: 'Registration not found' });
     res.json({ success: true, message: 'Unregistered successfully' });
   } catch (err) {

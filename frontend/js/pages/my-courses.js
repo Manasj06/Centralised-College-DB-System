@@ -1,8 +1,6 @@
 async function renderMyCourses() {
-  // Find student record by email match
-  const allRes = await api.get('/students');
-  const students = allRes.data?.data || [];
-  const myStudent = students.find(s => s.email === currentUser.email);
+  const studentRes = await api.get('/students/me');
+  const myStudent = studentRes.data?.data;
 
   if (!myStudent) {
     document.getElementById('content-area').innerHTML = `
@@ -16,7 +14,7 @@ async function renderMyCourses() {
     return;
   }
 
-  const res = await api.get(`/students/${myStudent.student_id}/courses`);
+  const res = await api.get('/students/me/courses');
   const courses = res.data?.data || [];
 
   const totalCredits = courses.reduce((sum, c) => sum + c.credits, 0);

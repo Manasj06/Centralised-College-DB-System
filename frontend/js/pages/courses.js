@@ -60,9 +60,8 @@ function renderCoursesTable() {
 }
 
 async function renderCourseCards() {
-  // Get student's existing registrations to show "Registered" status
-  const sid  = currentUser.user_id;
-  const rRes = await api.get(`/students/${sid}/courses`);
+  // Get current student's existing registrations to show "Registered" status
+  const rRes = await api.get('/students/me/courses');
   const registered = new Set((rRes.data?.data || []).map(r => r.course_id));
 
   document.getElementById('content-area').innerHTML = `
@@ -96,22 +95,9 @@ function filterCards(q) {
 }
 
 async function registerForCourse(courseId, btn) {
-  // Find student record matching this user
-  const sRes = await api.get(`/students/${currentUser.user_id}`);
-  let studentId = sRes.data?.data?.student_id;
-
-  // If no direct match, fetch all and find by email
-  if (!studentId) {
-    const allRes = await api.get('/students');
-    const match  = (allRes.data?.data || []).find(s => s.email === currentUser.email);
-    studentId    = match?.student_id;
-  }
-
-  if (!studentId) { toast('Student record not found', 'error'); return; }
-
   btn.disabled = true;
   btn.textContent = '…';
-  const res = await api.post('/registrations', { student_id: studentId, course_id: courseId });
+  const res = await api.post('/registrations', { course_id: courseId });
   if (res.ok) {
     btn.textContent = '✓ Registered';
     btn.className = 'btn btn-sm btn-secondary';
