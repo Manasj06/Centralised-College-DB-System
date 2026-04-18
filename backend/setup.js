@@ -44,7 +44,7 @@ async function setup() {
       college_id       INT AUTO_INCREMENT PRIMARY KEY,
       college_name     VARCHAR(150) NOT NULL,
       city             VARCHAR(100),
-      established_year YEAR,
+      established_year SMALLINT UNSIGNED,
       email            VARCHAR(100),
       phone            VARCHAR(20)
     );
@@ -225,7 +225,7 @@ async function setup() {
   console.log('│ kavya_r      │ Student@123              │');
   console.log('└──────────────┴──────────────────────────┘');
   console.log('\n▶  Now run: node server.js');
-  console.log('▶  Open:    http://localhost:5000\n');
+  console.log(`▶  Open:    http://localhost:${process.env.PORT || 5000}\n`);
 }
 
 setup().catch(err => {

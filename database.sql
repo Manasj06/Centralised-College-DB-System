@@ -29,7 +29,7 @@ CREATE TABLE College (
   college_id       INT AUTO_INCREMENT PRIMARY KEY,
   college_name     VARCHAR(150) NOT NULL,
   city             VARCHAR(100),
-  established_year YEAR,
+  established_year SMALLINT UNSIGNED,
   email            VARCHAR(100),
   phone            VARCHAR(20)
 );
@@ -153,12 +153,10 @@ INSERT INTO College(college_name, city, established_year, email, phone) VALUES
   ('Sri Sivasubramaniya Nadar College', 'Chennai', 1996, 'info@ssn.edu.in',     '044-27469700');
 
 -- ============================================================
--- IMPORTANT: Run generate-hashes.js FIRST to get correct hashes
--- then paste them below, OR just run setup.js which does it all.
--- The hashes below are pre-generated with bcryptjs saltRounds=10:
---   Admin@123   → hash_admin
---   Faculty@123 → hash_faculty
---   Student@123 → hash_student
+-- Pre-generated bcryptjs hashes (saltRounds=10)
+--   Admin@123
+--   Faculty@123
+--   Student@123
 -- ============================================================
 -- Users + Logins
 INSERT INTO User(full_name, email, role_id) VALUES
@@ -169,14 +167,13 @@ INSERT INTO User(full_name, email, role_id) VALUES
   ('Ravi Kumar',           'ravi@student.edu',      3),
   ('Anitha Devi',          'anitha@student.edu',    3);
 
--- NOTE: Placeholder hashes below — run setup.js instead for correct hashes
 INSERT INTO Login(user_id, username, password_hash) VALUES
-  (1, 'admin',    'PLACEHOLDER_admin'),
-  (2, 'priya_r',  'PLACEHOLDER_faculty'),
-  (3, 'arjun_n',  'PLACEHOLDER_faculty'),
-  (4, 'kavya_r',  'PLACEHOLDER_student'),
-  (5, 'ravi_k',   'PLACEHOLDER_student'),
-  (6, 'anitha_d', 'PLACEHOLDER_student');
+  (1, 'admin',    '$2a$10$A/rWgAhRnRJvGnk2r9y6lehJT4xee3KlG5AR3ZYwh6BVyUnEeAW8K'),
+  (2, 'priya_r',  '$2a$10$jYZLLUr1fXmP2Nyc0XoNsuOUzZK8DdXxU2.MWLjnRTAX18QL5BRgW'),
+  (3, 'arjun_n',  '$2a$10$jYZLLUr1fXmP2Nyc0XoNsuOUzZK8DdXxU2.MWLjnRTAX18QL5BRgW'),
+  (4, 'kavya_r',  '$2a$10$U0y85xULBF8o33ZqKjr/Q.XLOEf/TITXUFryaiz8alRUm.r/5IPg2'),
+  (5, 'ravi_k',   '$2a$10$U0y85xULBF8o33ZqKjr/Q.XLOEf/TITXUFryaiz8alRUm.r/5IPg2'),
+  (6, 'anitha_d', '$2a$10$U0y85xULBF8o33ZqKjr/Q.XLOEf/TITXUFryaiz8alRUm.r/5IPg2');
 
 -- Permissions
 INSERT INTO Permission(role_id, module_name, can_read, can_write, can_delete) VALUES

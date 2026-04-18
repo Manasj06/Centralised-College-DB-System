@@ -28,7 +28,8 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 
 /* ── Utilities ─────────────────────────────────────────────── */
 .hidden   { display: none !important; }
-.active   { display: flex !important; }
+.page     { display: none; }
+.page.active { display: flex !important; }
 .flex     { display: flex; }
 .gap-2    { gap: 8px; }
 .gap-3    { gap: 12px; }
@@ -161,7 +162,9 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 
 /* ── App Shell ─────────────────────────────────────────────── */
 #app-shell {
-  display: flex; min-height: 100vh;
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
 }
 
 /* ── Sidebar ───────────────────────────────────────────────── */
@@ -249,10 +252,12 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 
 /* ── Main Content ──────────────────────────────────────────── */
 .main-content {
-  flex: 1;
   margin-left: var(--sidebar-w);
+  width: calc(100% - var(--sidebar-w));
+  max-width: calc(100% - var(--sidebar-w));
   display: flex; flex-direction: column;
   min-height: 100vh;
+  min-width: 0;
 }
 
 .topbar {
@@ -266,7 +271,11 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .topbar-title { font-size: 18px; font-weight: 700; flex: 1; }
 .topbar-actions { display: flex; gap: 10px; }
 
-.content-area { flex: 1; padding: 28px; }
+.content-area {
+  flex: 1;
+  padding: 28px;
+  min-width: 0;
+}
 
 /* ── Cards ─────────────────────────────────────────────────── */
 .card {
@@ -518,7 +527,11 @@ tbody td { padding: 13px 16px; color: var(--text); }
   :root { --sidebar-w: 0px; }
   .sidebar { transform: translateX(-240px); width: 240px; }
   .sidebar.open { transform: translateX(0); }
-  .main-content { margin-left: 0; }
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    max-width: 100%;
+  }
   .dashboard-grid { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
 }

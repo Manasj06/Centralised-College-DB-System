@@ -1,0 +1,10 @@
+.DS_Store
+
+/.mysql-data/
+/.mysql-data2/
+/.mysql-undo2/
+/.mysql-undo2-bak/
+
+/package-lock.json
+/backend/node_modules/
+/backend/package-lock.json

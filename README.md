@@ -55,25 +55,7 @@ college-cms/
 
 ---
 
-### Step 1: Database Setup
-
-Open MySQL and run the setup file:
-
-```bash
-mysql -u root -p < database.sql
-```
-
-Or open MySQL Workbench and execute `database.sql`.
-
-This creates:
-- All 8 tables (Roles, College, User, Login, Permission, Student, Course, Registration)
-- Sample data with 4 colleges, 10 courses, 8 students, 6 users
-- 2 triggers for registration audit logging
-- 2 views for reporting
-
----
-
-### Step 2: Backend Setup
+### Step 1: Backend Setup
 
 ```bash
 cd backend
@@ -91,6 +73,25 @@ JWT_SECRET=college_cms_super_secret_2024
 PORT=5000
 ```
 
+Initialize the database with seeded users and real bcrypt password hashes:
+
+```bash
+node setup.js
+```
+
+This creates:
+- All 8 tables (Roles, College, User, Login, Permission, Student, Course, Registration)
+- Sample data with 4 colleges, 10 courses, 8 students, 6 users
+- Registration audit trigger
+- Reporting view
+- Working test logins for the sample users
+
+If you prefer a manual SQL import, you can also run:
+
+```bash
+mysql -u root < database.sql
+```
+
 Start the server:
 
 ```bash
@@ -105,9 +106,7 @@ You should see:
 🚀 College CMS Server running on http://localhost:5000
 ```
 
----
-
-### Step 3: Open Frontend
+### Step 2: Open Frontend
 
 Open your browser and go to:
 

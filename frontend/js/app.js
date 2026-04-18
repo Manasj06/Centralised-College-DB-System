@@ -41,7 +41,7 @@ const PAGES = {
   'my-courses':  () => renderMyCourses(),
 };
 
-function navigate(pageId) {
+async function navigate(pageId) {
   currentPage = pageId;
   // Update active nav
   document.querySelectorAll('.nav-item').forEach(el => {
@@ -53,9 +53,36 @@ function navigate(pageId) {
   // Clear topbar actions
   document.getElementById('topbar-actions').innerHTML = '';
   // Load page
-  document.getElementById('content-area').innerHTML = spinner();
-  if (PAGES[pageId]) PAGES[pageId]();
-  else document.getElementById('content-area').innerHTML = '<p>Page not found</p>';
+  const contentArea = document.getElementById('content-area');
+  contentArea.innerHTML = spinner();
+
+  // Collapse the sidebar after navigation on smaller screens.
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('open');
+  }
+
+  try {
+    if (PAGES[pageId]) {
+      await PAGES[pageId]();
+    } else {
+      contentArea.innerHTML = '<p>Page not found</p>';
+    }
+  } catch (err) {
+    console.error(`Failed to render page "${pageId}"`, err);
+    contentArea.innerHTML = `
+      <div class="card">
+        <div class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <h4>Couldn't load this page</h4>
+          <p>Please try again. If it keeps happening, check the browser console for details.</p>
+        </div>
+      </div>`;
+    toast('Failed to load page', 'error');
+  }
 }
 
 // ── Login ──────────────────────────────────────────────────────
@@ -107,16 +134,26 @@ function doLogout() {
   localStorage.removeItem('cms_token');
   localStorage.removeItem('cms_user');
   currentUser = null;
-  document.getElementById('app-shell').classList.add('hidden');
-  document.getElementById('login-page').classList.add('active');
+  setAuthenticatedView(false);
   document.getElementById('login-username').value = '';
   document.getElementById('login-password').value = '';
 }
 
+function setAuthenticatedView(isAuthenticated) {
+  document.getElementById('login-page').classList.toggle('active', !isAuthenticated);
+  document.getElementById('app-shell').classList.toggle('hidden', !isAuthenticated);
+
+  if (!isAuthenticated) {
+    document.getElementById('sidebar').classList.remove('open');
+    closeModal();
+  }
+
+  window.scrollTo(0, 0);
+}
+
 // ── Boot app ───────────────────────────────────────────────────
 function bootApp() {
-  document.getElementById('login-page').classList.remove('active');
-  document.getElementById('app-shell').classList.remove('hidden');
+  setAuthenticatedView(true);
 
   // Set sidebar user info
   document.getElementById('sidebar-username').textContent = currentUser.name;
