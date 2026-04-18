@@ -60,9 +60,9 @@
               <path d="M8 28L20 12L32 28H8Z" fill="#fff" opacity="0.9"/>
               <rect x="15" y="20" width="10" height="8" rx="1" fill="#1a1a2e"/>
             </svg>
-            <span>CollegeCMS</span>
+            <span class="sidebar-logo-text">CollegeCMS</span>
           </div>
-          <button class="sidebar-toggle" onclick="toggleSidebar()">
+          <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()" aria-label="Collapse sidebar" title="Collapse sidebar">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </button>
         </div>
@@ -81,7 +81,7 @@
 
         <button class="sidebar-logout" onclick="doLogout()">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-          Logout
+          <span class="sidebar-logout-text">Logout</span>
         </button>
       </aside>
 

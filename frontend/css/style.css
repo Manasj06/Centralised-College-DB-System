@@ -21,6 +21,7 @@
   --font:      'DM Sans', sans-serif;
   --font-mono: 'DM Mono', monospace;
   --sidebar-w: 240px;
+  --sidebar-collapsed-w: 84px;
   --transition:0.2s ease;
 }
 
@@ -178,6 +179,10 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   transition: width var(--transition);
 }
 
+#app-shell.sidebar-collapsed .sidebar {
+  width: var(--sidebar-collapsed-w);
+}
+
 .sidebar-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 20px 16px 16px;
@@ -186,11 +191,18 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .sidebar-logo {
   display: flex; align-items: center; gap: 10px;
   font-size: 16px; font-weight: 700; color: #fff;
+  min-width: 0;
+}
+.sidebar-logo svg { flex-shrink: 0; }
+.sidebar-logo-text {
+  white-space: nowrap;
+  transition: opacity var(--transition), width var(--transition);
 }
 .sidebar-toggle {
   background: none; border: none; cursor: pointer;
   color: rgba(255,255,255,0.5); padding: 4px;
   border-radius: 6px;
+  flex-shrink: 0;
   transition: color var(--transition), background var(--transition);
 }
 .sidebar-toggle:hover { color: #fff; background: rgba(255,255,255,0.08); }
@@ -199,6 +211,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   display: flex; align-items: center; gap: 12px;
   padding: 16px;
   border-bottom: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
 }
 .avatar {
   width: 36px; height: 36px; border-radius: 50%;
@@ -207,7 +220,10 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   font-size: 14px; font-weight: 700; color: #fff;
   flex-shrink: 0;
 }
-.user-info { overflow: hidden; }
+.user-info {
+  overflow: hidden;
+  transition: opacity var(--transition), width var(--transition);
+}
 .user-name {
   font-size: 13px; font-weight: 600; color: #fff;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -238,6 +254,12 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .nav-item.active { background: var(--sidebar-active); color: #fff; }
 .nav-item svg   { flex-shrink: 0; opacity: 0.8; }
 .nav-item.active svg { opacity: 1; }
+.nav-item-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity var(--transition), width var(--transition);
+}
 
 .sidebar-logout {
   display: flex; align-items: center; gap: 10px;
@@ -249,6 +271,10 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   transition: all var(--transition);
 }
 .sidebar-logout:hover { background: rgba(233,69,96,0.2); }
+.sidebar-logout-text {
+  white-space: nowrap;
+  transition: opacity var(--transition), width var(--transition);
+}
 
 /* ── Main Content ──────────────────────────────────────────── */
 .main-content {
@@ -258,6 +284,49 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   display: flex; flex-direction: column;
   min-height: 100vh;
   min-width: 0;
+  transition: margin-left var(--transition), width var(--transition), max-width var(--transition);
+}
+
+#app-shell.sidebar-collapsed .main-content {
+  margin-left: var(--sidebar-collapsed-w);
+  width: calc(100% - var(--sidebar-collapsed-w));
+  max-width: calc(100% - var(--sidebar-collapsed-w));
+}
+
+#app-shell.sidebar-collapsed .sidebar-header {
+  padding-inline: 12px;
+}
+
+#app-shell.sidebar-collapsed .sidebar-logo-text,
+#app-shell.sidebar-collapsed .user-info,
+#app-shell.sidebar-collapsed .nav-section,
+#app-shell.sidebar-collapsed .nav-item-label,
+#app-shell.sidebar-collapsed .sidebar-logout-text {
+  opacity: 0;
+  width: 0;
+  pointer-events: none;
+}
+
+#app-shell.sidebar-collapsed .sidebar-user {
+  justify-content: center;
+  padding-inline: 12px;
+  gap: 0;
+}
+
+#app-shell.sidebar-collapsed .nav-item {
+  justify-content: center;
+  padding-inline: 0;
+  gap: 0;
+}
+
+#app-shell.sidebar-collapsed .sidebar-logout {
+  justify-content: center;
+  padding-inline: 0;
+  gap: 0;
+}
+
+#app-shell.sidebar-collapsed .sidebar-logo {
+  gap: 0;
 }
 
 .topbar {
@@ -527,6 +596,7 @@ tbody td { padding: 13px 16px; color: var(--text); }
   :root { --sidebar-w: 0px; }
   .sidebar { transform: translateX(-240px); width: 240px; }
   .sidebar.open { transform: translateX(0); }
+  #app-shell.sidebar-collapsed .sidebar { width: 240px; }
   .main-content {
     margin-left: 0;
     width: 100%;

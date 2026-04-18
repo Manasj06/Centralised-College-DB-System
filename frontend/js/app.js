@@ -1,6 +1,7 @@
 // ── State ──────────────────────────────────────────────────────
 let currentUser = null;
 let currentPage = null;
+const SIDEBAR_PREF_KEY = 'cms_sidebar_collapsed';
 
 // ── Nav config per role ────────────────────────────────────────
 const NAV = {
@@ -162,6 +163,7 @@ function bootApp() {
 
   // Build nav
   buildNav(currentUser.role);
+  syncSidebarState();
 
   // Navigate to default page
   const defaultPage = currentUser.role === 'Student' ? 'courses' : 'dashboard';
@@ -176,21 +178,74 @@ function buildNav(role) {
       return `<div class="nav-section">${item.section}</div>`;
     }
     return `
-      <div class="nav-item" data-page="${item.id}" onclick="navigate('${item.id}')">
+      <div class="nav-item" data-page="${item.id}" onclick="navigate('${item.id}')" title="${item.label}">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
           <path d="${item.icon}" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        ${item.label}
+        <span class="nav-item-label">${item.label}</span>
       </div>`;
   }).join('');
 }
 
+function isMobileLayout() {
+  return window.innerWidth <= 768;
+}
+
+function setSidebarCollapsed(collapsed, persist = true) {
+  const appShell = document.getElementById('app-shell');
+  appShell.classList.toggle('sidebar-collapsed', collapsed && !isMobileLayout());
+
+  if (persist) {
+    localStorage.setItem(SIDEBAR_PREF_KEY, collapsed ? '1' : '0');
+  }
+
+  updateSidebarToggle();
+}
+
+function syncSidebarState() {
+  const appShell = document.getElementById('app-shell');
+  const sidebar = document.getElementById('sidebar');
+
+  if (isMobileLayout()) {
+    appShell.classList.remove('sidebar-collapsed');
+  } else {
+    setSidebarCollapsed(localStorage.getItem(SIDEBAR_PREF_KEY) === '1', false);
+  }
+
+  sidebar.classList.remove('open');
+  updateSidebarToggle();
+}
+
+function updateSidebarToggle() {
+  const toggle = document.getElementById('sidebar-toggle');
+  if (!toggle) return;
+
+  const sidebar = document.getElementById('sidebar');
+  const collapsed = document.getElementById('app-shell').classList.contains('sidebar-collapsed');
+  const label = isMobileLayout()
+    ? (sidebar.classList.contains('open') ? 'Close sidebar' : 'Open sidebar')
+    : (collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+
+  toggle.setAttribute('aria-label', label);
+  toggle.title = label;
+}
+
 function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
+  const sidebar = document.getElementById('sidebar');
+
+  if (isMobileLayout()) {
+    sidebar.classList.toggle('open');
+    updateSidebarToggle();
+    return;
+  }
+
+  const collapsed = document.getElementById('app-shell').classList.contains('sidebar-collapsed');
+  setSidebarCollapsed(!collapsed);
 }
 
 // ── Auto-login if token present ────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
+  syncSidebarState();
   const token = localStorage.getItem('cms_token');
   const user  = localStorage.getItem('cms_user');
   if (token && user) {
@@ -198,3 +253,5 @@ window.addEventListener('DOMContentLoaded', () => {
     bootApp();
   }
 });
+
+window.addEventListener('resize', syncSidebarState);
